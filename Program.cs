@@ -1,7 +1,8 @@
-﻿using System;
+﻿//Julio Ruiz Matricula:2024-2009
+using System;
 using System.Collections.Generic;
-//Julio Ruiz Matricuala:2024-2009
-class ContactAgenda
+
+class Contactes
 {
     static List<int> ids = new List<int>();
     static Dictionary<int, string> names = new Dictionary<int, string>();
@@ -14,60 +15,68 @@ class ContactAgenda
 
     static void Main()
     {
-        Console.WriteLine("Bienvenido a tu Agenda Personal");
-
+        Console.WriteLine("Bienvenido a mi lista de Contactes");
         bool running = true;
+
         while (running)
         {
             MostrarMenu();
-            int opcion = LeerOpcion();
-            Console.Clear();
+
+            string entrada = Console.ReadLine();
+            if (!int.TryParse(entrada, out int opcion))
+            {
+                Console.WriteLine("Entrada inválida.");
+                continue;
+            }
 
             switch (opcion)
             {
-                case 1: AgregarContacto(); break;
-                case 2: MostrarContactos(); break;
-                case 3: BuscarContacto(); break;
-                case 4: ModificarContacto(); break;
-                case 5: EliminarContacto(); break;
+                case 1: AddContact(); break;
+                case 2: ViewContacts(); break;
+                case 3: SearchContact(); break;
+                case 4: ModifyContact(); break;
+                case 5: DeleteContact(); break;
                 case 6: running = false; break;
-                default: Console.WriteLine("Opción inválida. Intente de nuevo."); break;
+                default: Console.WriteLine("Opción no válida."); break;
             }
         }
 
-        Console.WriteLine("Agenda finalizada.");
+        Console.WriteLine("Fin de la Agenda.");
     }
 
     static void MostrarMenu()
     {
-        Console.WriteLine("\nMenú de Opciones:");
+        Console.WriteLine("\nMenú de opciones:");
         Console.WriteLine("1. Agregar Contacto");
         Console.WriteLine("2. Ver Contactos");
         Console.WriteLine("3. Buscar Contacto");
         Console.WriteLine("4. Modificar Contacto");
         Console.WriteLine("5. Eliminar Contacto");
         Console.WriteLine("6. Salir");
-        Console.Write("Seleccione una opción: ");
+        Console.Write("Digite el número de la opción deseada: ");
     }
 
-    static int LeerOpcion()
-    {
-        return int.TryParse(Console.ReadLine(), out int opcion) ? opcion : 0;
-    }
-
-    static void AgregarContacto()
+    static void AddContact()
     {
         int id = ids.Count + 1;
+        ids.Add(id);
+
         Console.Write("Nombre: "); string name = Console.ReadLine();
         Console.Write("Apellido: "); string lastname = Console.ReadLine();
         Console.Write("Dirección: "); string address = Console.ReadLine();
         Console.Write("Teléfono: "); string phone = Console.ReadLine();
         Console.Write("Email: "); string email = Console.ReadLine();
-        Console.Write("Edad: "); int age = Convert.ToInt32(Console.ReadLine());
-        Console.Write("¿Es mejor amigo? (1.Sí / 2.No): ");
-        bool isBestFriend = Convert.ToInt32(Console.ReadLine()) == 1;
 
-        ids.Add(id);
+        Console.Write("Edad: ");
+        if (!int.TryParse(Console.ReadLine(), out int age))
+        {
+            Console.WriteLine("Edad inválida.");
+            return;
+        }
+
+        Console.Write("¿Es mejor amigo? (1. Sí / 2. No): ");
+        bool isBestFriend = Console.ReadLine() == "1";
+
         names[id] = name;
         lastnames[id] = lastname;
         addresses[id] = address;
@@ -79,7 +88,7 @@ class ContactAgenda
         Console.WriteLine("Contacto agregado exitosamente.");
     }
 
-    static void MostrarContactos()
+    static void ViewContacts()
     {
         if (ids.Count == 0)
         {
@@ -88,7 +97,6 @@ class ContactAgenda
         }
 
         Console.WriteLine("\nListado de Contactos:");
-
         foreach (var id in ids)
         {
             Console.WriteLine($"ID: {id}");
@@ -99,43 +107,43 @@ class ContactAgenda
             Console.WriteLine($"Email: {emails[id]}");
             Console.WriteLine($"Edad: {ages[id]}");
             Console.WriteLine($"¿Mejor amigo?: {(bestFriends[id] ? "Sí" : "No")}");
-            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("----------------------------------");
         }
     }
 
-    static void BuscarContacto()
+    static void SearchContact()
     {
-        Console.Write("\nDigite nombre o apellido para buscar: ");
-        string filtro = Console.ReadLine().ToLower();
-        bool encontrado = false;
+        Console.Write("Ingrese nombre o apellido a buscar: ");
+        string searchTerm = Console.ReadLine().ToLower();
+        bool found = false;
 
         foreach (var id in ids)
         {
-            if (names[id].ToLower().Contains(filtro) || lastnames[id].ToLower().Contains(filtro))
+            if (names[id].ToLower().Contains(searchTerm) || lastnames[id].ToLower().Contains(searchTerm))
             {
                 Console.WriteLine($"ID: {id}");
                 Console.WriteLine($"Nombre: {names[id]}");
                 Console.WriteLine($"Apellido: {lastnames[id]}");
+                Console.WriteLine($"Dirección: {addresses[id]}");
                 Console.WriteLine($"Teléfono: {telephones[id]}");
                 Console.WriteLine($"Email: {emails[id]}");
                 Console.WriteLine($"Edad: {ages[id]}");
                 Console.WriteLine($"¿Mejor amigo?: {(bestFriends[id] ? "Sí" : "No")}");
-                Console.WriteLine("------------------------------------------");
-                encontrado = true;
+                Console.WriteLine("----------------------------------");
+                found = true;
             }
         }
 
-        if (!encontrado) Console.WriteLine("No se encontró ningún contacto.");
+        if (!found)
+            Console.WriteLine("No se encontró ningún contacto.");
     }
 
-    static void ModificarContacto()
+    static void ModifyContact()
     {
-        Console.Write("\nDigite el ID del contacto a modificar: ");
-        int id = Convert.ToInt32(Console.ReadLine());
-
-        if (!ids.Contains(id))
+        Console.Write("Ingrese el ID del contacto a modificar: ");
+        if (!int.TryParse(Console.ReadLine(), out int id) || !ids.Contains(id))
         {
-            Console.WriteLine("Contacto no encontrado.");
+            Console.WriteLine("ID inválido.");
             return;
         }
 
@@ -144,18 +152,25 @@ class ContactAgenda
         Console.Write("Nueva dirección: "); addresses[id] = Console.ReadLine();
         Console.Write("Nuevo teléfono: "); telephones[id] = Console.ReadLine();
         Console.Write("Nuevo email: "); emails[id] = Console.ReadLine();
-        Console.Write("Nueva edad: "); ages[id] = Convert.ToInt32(Console.ReadLine());
-        Console.Write("¿Es mejor amigo? (1.Sí / 2.No): "); bestFriends[id] = Convert.ToInt32(Console.ReadLine()) == 1;
 
-        Console.WriteLine("Contacto actualizado correctamente.");
+        Console.Write("Nueva edad: ");
+        if (!int.TryParse(Console.ReadLine(), out int age))
+        {
+            Console.WriteLine("Edad inválida.");
+            return;
+        }
+        ages[id] = age;
+
+        Console.Write("¿Es mejor amigo? (1. Sí / 2. No): ");
+        bestFriends[id] = Console.ReadLine() == "1";
+
+        Console.WriteLine("Contacto modificado correctamente.");
     }
 
-    static void EliminarContacto()
+    static void DeleteContact()
     {
-        Console.Write("\nDigite el ID del contacto a eliminar: ");
-        int id = Convert.ToInt32(Console.ReadLine());
-
-        if (!ids.Contains(id))
+        Console.Write("Ingrese el ID del contacto a eliminar: ");
+        if (!int.TryParse(Console.ReadLine(), out int id) || !ids.Contains(id))
         {
             Console.WriteLine("ID inválido.");
             return;
